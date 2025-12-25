@@ -1,0 +1,1046 @@
+{
+    "info": {
+        "_postman_id": "uas-manbd-api-v1-id",
+        "name": "UAS MANBD API - Test Suite (Bahasa Indonesia)",
+        "description": "API Sistem Tiket Acara dengan tes komprehensif dalam Bahasa Indonesia",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8050/api/v1",
+            "type": "string"
+        },
+        {
+            "key": "rootUrl",
+            "value": "http://localhost:8050",
+            "type": "string"
+        },
+        {
+            "key": "eventId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "ticketId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "ticketCode",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "1. Pengecekan Sistem (Health Check)",
+            "item": [
+                {
+                    "name": "Cek Kesehatan - Berhasil",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki pesan', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.be.a('string');",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki meta.timestamp', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.meta.timestamp).to.be.a('string');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{rootUrl}}/health",
+                            "host": [
+                                "{{rootUrl}}"
+                            ],
+                            "path": [
+                                "health"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Halaman Utama (Root) - Berhasil",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki data techstack', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data.techstack).to.include('FastAPI');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{rootUrl}}/",
+                            "host": [
+                                "{{rootUrl}}"
+                            ],
+                            "path": [
+                                ""
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "2. Manajemen Acara (Events)",
+            "item": [
+                {
+                    "name": "2.1 Buat Acara - Berhasil",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.test('Acara memiliki field yang dibutuhkan', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data).to.have.property('_id');",
+                                    "    pm.expect(data).to.have.property('name');",
+                                    "    pm.expect(data).to.have.property('ticket_quota');",
+                                    "    pm.expect(data).to.have.property('ticket_stock');",
+                                    "});",
+                                    "",
+                                    "pm.test('Stok tiket sama dengan kuota saat pembuatan', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data.ticket_stock).to.eql(data.ticket_quota);",
+                                    "});",
+                                    "",
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.data && jsonData.data._id) {",
+                                    "    pm.collectionVariables.set('eventId', jsonData.data._id);",
+                                    "    console.log('Event ID tersimpan:', jsonData.data._id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Konferensi Teknologi Nusantara 2024\",\n  \"description\": \"Konferensi teknologi tahunan terbesar yang membahas inovasi masa depan Indonesia.\",\n  \"start_date\": \"2024-12-25T09:00:00\",\n  \"end_date\": \"2024-12-25T18:00:00\",\n  \"location\": \"Jakarta Convention Center, Senayan\",\n  \"ticket_base_price\": 150000,\n  \"ticket_quota\": 100\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/events",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2.2 Ambil Semua Acara - Berhasil",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.test('Data berupa array', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.be.an('array');",
+                                    "});",
+                                    "",
+                                    "pm.test('Acara memiliki field list yang dibutuhkan', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    if (data.length > 0) {",
+                                    "        pm.expect(data[0]).to.have.property('name');",
+                                    "        pm.expect(data[0]).to.have.property('description');",
+                                    "        pm.expect(data[0]).to.have.property('start_date');",
+                                    "        pm.expect(data[0]).to.have.property('end_date');",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/events",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2.3 Ambil Detail Acara (ID) - Berhasil",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.test('Acara memiliki detail lengkap', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data).to.have.property('name');",
+                                    "    pm.expect(data).to.have.property('location');",
+                                    "    pm.expect(data).to.have.property('ticket_base_price');",
+                                    "    pm.expect(data).to.have.property('ticket_quota');",
+                                    "    pm.expect(data).to.have.property('ticket_stock');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/events/{{eventId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events",
+                                "{{eventId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2.4 Ambil Detail Acara - Tidak Ditemukan",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 404', function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=false', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(false);",
+                                    "});",
+                                    "",
+                                    "pm.test('Kode error adalah EVENT_NOT_FOUND', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.error.code).to.eql('EVENT_NOT_FOUND');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/events/000000000000000000000000",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events",
+                                "000000000000000000000000"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2.5 Perbarui Acara - Berhasil",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.test('Nama acara telah diperbarui', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data.name).to.include('Diperbarui');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Konferensi Teknologi Nusantara 2024 - Diperbarui\",\n  \"description\": \"Konferensi teknologi tahunan terbesar (Deskripsi Diperbarui)\",\n  \"start_date\": \"2024-12-26T09:00:00\",\n  \"end_date\": \"2024-12-26T18:00:00\",\n  \"location\": \"Jakarta Convention Center Hall A\",\n  \"ticket_base_price\": 175000,\n  \"ticket_quota\": 150\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/events/{{eventId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events",
+                                "{{eventId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2.6 Ambil Statistik Acara (Insights) - Kosong",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.test('Statistik memiliki field yang dibutuhkan', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data).to.have.property('total_revenue');",
+                                    "    pm.expect(data).to.have.property('total_attendees');",
+                                    "    pm.expect(data).to.have.property('ticket_sold_count');",
+                                    "});",
+                                    "",
+                                    "pm.test('Statistik awal masih nol', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data.total_revenue).to.eql(0);",
+                                    "    pm.expect(data.total_attendees).to.eql(0);",
+                                    "    pm.expect(data.ticket_sold_count).to.eql(0);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/events/{{eventId}}/insights",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events",
+                                "{{eventId}}",
+                                "insights"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "3. Tiket (Tickets)",
+            "item": [
+                {
+                    "name": "3.1 Beli Tiket (Tunai) - Berhasil",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.test('Tiket memiliki field yang dibutuhkan', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data).to.have.property('_id');",
+                                    "    pm.expect(data).to.have.property('code');",
+                                    "    pm.expect(data).to.have.property('base_price');",
+                                    "    pm.expect(data).to.have.property('final_price');",
+                                    "    pm.expect(data).to.have.property('payment_method');",
+                                    "    pm.expect(data).to.have.property('status');",
+                                    "});",
+                                    "",
+                                    "pm.test('Pembayaran tunai tidak ada biaya tambahan', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data.final_price).to.eql(data.base_price);",
+                                    "});",
+                                    "",
+                                    "pm.test('Kode tiket diawali MANBD-', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data.code).to.match(/^MANBD-\\d{6}$/);",
+                                    "});",
+                                    "",
+                                    "pm.test('Status tiket adalah unused', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data.status).to.eql('unused');",
+                                    "});",
+                                    "",
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.data && jsonData.data._id) {",
+                                    "    pm.collectionVariables.set('ticketId', jsonData.data._id);",
+                                    "    pm.collectionVariables.set('ticketCode', jsonData.data.code);",
+                                    "    console.log('Tiket ID tersimpan:', jsonData.data._id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"payment_method\": \"cash\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/events/{{eventId}}/tickets",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events",
+                                "{{eventId}}",
+                                "tickets"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.2 Beli Tiket (Daring) - Berhasil",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Pembayaran daring ada biaya tambahan 25%', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    var expectedFinalPrice = data.base_price * 1.25;",
+                                    "    pm.expect(data.final_price).to.eql(expectedFinalPrice);",
+                                    "});",
+                                    "",
+                                    "pm.test('Metode pembayaran adalah online', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data.payment_method).to.eql('online');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"payment_method\": \"online\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/events/{{eventId}}/tickets",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events",
+                                "{{eventId}}",
+                                "tickets"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.3 Ambil Tiket berdasarkan Acara - Berhasil",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.test('Data berupa array dengan 2 tiket', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.be.an('array');",
+                                    "    pm.expect(jsonData.data.length).to.eql(2);",
+                                    "});",
+                                    "",
+                                    "pm.test('Tiket memiliki field list yang sesuai', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    if (data.length > 0) {",
+                                    "        pm.expect(data[0]).to.have.property('code');",
+                                    "        pm.expect(data[0]).to.have.property('base_price');",
+                                    "        pm.expect(data[0]).to.have.property('final_price');",
+                                    "        pm.expect(data[0]).to.have.property('payment_method');",
+                                    "        pm.expect(data[0]).to.have.property('status');",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/tickets?event_id={{eventId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tickets"
+                            ],
+                            "query": [
+                                {
+                                    "key": "event_id",
+                                    "value": "{{eventId}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.4 Ambil Statistik Acara - Setelah Penjualan",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Jumlah tiket terjual adalah 2', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data.ticket_sold_count).to.eql(2);",
+                                    "});",
+                                    "",
+                                    "pm.test('Total hadir masih 0 (belum check-in)', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data.total_attendees).to.eql(0);",
+                                    "});",
+                                    "",
+                                    "pm.test('Total pendapatan telah terhitung', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data.total_revenue).to.be.above(0);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/events/{{eventId}}/insights",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events",
+                                "{{eventId}}",
+                                "insights"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.5 Check-in Tiket - Berhasil",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.test('Pesan mengonfirmasi tiket berhasil digunakan', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.include('used');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/tickets/{{ticketId}}/check-in",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tickets",
+                                "{{ticketId}}",
+                                "check-in"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.6 Check-in Tiket - Sudah Digunakan",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 400', function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=false', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(false);",
+                                    "});",
+                                    "",
+                                    "pm.test('Kode error adalah TICKET_ALREADY_USED', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.error.code).to.eql('TICKET_ALREADY_USED');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/tickets/{{ticketId}}/check-in",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tickets",
+                                "{{ticketId}}",
+                                "check-in"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.7 Ambil Statistik Acara - Setelah Check-in",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Total hadir bertambah menjadi 1', function () {",
+                                    "    var data = pm.response.json().data;",
+                                    "    pm.expect(data.total_attendees).to.eql(1);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/events/{{eventId}}/insights",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events",
+                                "{{eventId}}",
+                                "insights"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.8 Check-in Tiket - Tidak Ditemukan",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 404', function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});",
+                                    "",
+                                    "pm.test('Kode error adalah TICKET_NOT_FOUND', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.error.code).to.eql('TICKET_NOT_FOUND');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/tickets/000000000000000000000000/check-in",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tickets",
+                                "000000000000000000000000",
+                                "check-in"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "4. Tes Validasi (Validation Tests)",
+            "item": [
+                {
+                    "name": "4.1 Buat Acara - Data Tidak Lengkap",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 422', function () {",
+                                    "    pm.response.to.have.status(422);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=false', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(false);",
+                                    "});",
+                                    "",
+                                    "pm.test('Kode error adalah PYDANTIC-422', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.error.code).to.eql('PYDANTIC-422');",
+                                    "});",
+                                    "",
+                                    "pm.test('Error memiliki detail field', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.error.fields).to.be.an('array');",
+                                    "    pm.expect(jsonData.error.fields.length).to.be.above(0);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Acara Tidak Lengkap\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/events",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "4.2 Beli Tiket - Metode Pembayaran Salah",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 422', function () {",
+                                    "    pm.response.to.have.status(422);",
+                                    "});",
+                                    "",
+                                    "pm.test('Kode error adalah PYDANTIC-422', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.error.code).to.eql('PYDANTIC-422');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"payment_method\": \"kartu_kredit\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/events/{{eventId}}/tickets",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events",
+                                "{{eventId}}",
+                                "tickets"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "5. Pembersihan Data (Cleanup)",
+            "item": [
+                {
+                    "name": "5.1 Hapus Tiket",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/tickets/{{ticketId}}?event_id={{eventId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tickets",
+                                "{{ticketId}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "event_id",
+                                    "value": "{{eventId}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "5.2 Hapus Acara",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.collectionVariables.set('eventId', '');",
+                                    "pm.collectionVariables.set('ticketId', '');",
+                                    "pm.collectionVariables.set('ticketCode', '');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/events/{{eventId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "events",
+                                "{{eventId}}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "6. Utilitas (Utils)",
+            "item": [
+                {
+                    "name": "Reset Database - Berhasil",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Kode status adalah 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Respon memiliki success=true', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.collectionVariables.set('eventId', '');",
+                                    "pm.collectionVariables.set('ticketId', '');",
+                                    "pm.collectionVariables.set('ticketCode', '');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/reset-database",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "reset-database"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
