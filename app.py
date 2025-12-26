@@ -528,8 +528,8 @@ class UtilController():
         """
         Reset database. Digunakan untuk kebutuhan development dan latihan
         """
-        await Event.delete_many({})
-        await TicketSold.delete_many({})
+        await Event.delete_all()
+        await TicketSold.delete_all()
         return APIResponse(success=True, message="database reset successful")
 
     async def health_check(self):
