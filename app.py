@@ -184,7 +184,7 @@ class TicketSold(Document):
     base_price: float
     final_price: float
     status: Literal["used", "unused"] = Indexed()
-    used_at: Optional[datetime]
+    used_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.now)
 
     class Settings:
