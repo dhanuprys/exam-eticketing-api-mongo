@@ -6,5 +6,4 @@ Nama Kelompok:
 2. Made Marsel Biliana Wijaya (2415091090)
 3. Gede Dhanu Purnayasa (2415091092)
 
-Link Video: <link disini>
-Link Github: https://github.com/dhanuprys/exam-eticketing-api-mongo
+Link Video: https://youtu.be/M6xF9O_oJqE?si=m2m10FiXCnax9cCT
