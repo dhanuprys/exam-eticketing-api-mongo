@@ -287,21 +287,20 @@ class EventService():
             raise APIError(status_code=status.HTTP_404_NOT_FOUND,
                            error_code="EVENT_NOT_FOUND")
 
-        # Quota validation: cannot reduce quota below what is already sold
+        # Validasi quota: tidak boleh mengurangi quota dibawah yang sudah terjual
         sold_count = await TicketSold.find({"event_id": event_id}).count()
 
         if request.ticket_quota < sold_count:
             raise APIError(status_code=status.HTTP_400_BAD_REQUEST,
                            error_code="INVALID_QUOTA")
 
-        # Calculate the difference BEFORE modifying event object
-        # This prevents race conditions where sales happen during update
+        # Menghitung perbedaan quota
         quota_diff = request.ticket_quota - event.ticket_quota
 
         for key, value in request.dict().items():
             setattr(event, key, value)
 
-        # Update fields and increment stock atomically
+        # Update fields dan increment stock secara atomically
         await event.update({
             "$set": {
                 **request.dict(exclude={"ticket_quota"}), "ticket_quota":
@@ -313,7 +312,7 @@ class EventService():
             }
         })
 
-        # Fetch updated document to return
+        # Mengembalikan document yang diperbarui
         return await Event.find_one({"_id": ObjectId(event_id)})
 
     async def delete_event(self, event_id: str):
